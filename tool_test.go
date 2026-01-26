@@ -1,6 +1,7 @@
 package toolmodel
 
 import (
+	"encoding/json"
 	"testing"
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
@@ -254,5 +255,231 @@ func TestToolIcon_Alias(t *testing.T) {
 	var mcpIcon mcp.Icon = icon
 	if mcpIcon.Source != "https://example.com/icon.png" {
 		t.Errorf("Icon Source = %q, want %q", mcpIcon.Source, "https://example.com/icon.png")
+	}
+}
+
+func TestTool_ToMCPJSON(t *testing.T) {
+	tool := Tool{
+		Tool: mcp.Tool{
+			Name:        "test-tool",
+			Description: "A test tool",
+			InputSchema: map[string]any{
+				"type": "object",
+				"properties": map[string]any{
+					"input": map[string]any{"type": "string"},
+				},
+			},
+		},
+		Namespace: "test-ns",
+		Version:   "1.0.0",
+	}
+
+	data, err := tool.ToMCPJSON()
+	if err != nil {
+		t.Fatalf("ToMCPJSON() error = %v", err)
+	}
+
+	// Parse the JSON and verify namespace/version are NOT present
+	var result map[string]any
+	if err := json.Unmarshal(data, &result); err != nil {
+		t.Fatalf("Failed to unmarshal ToMCPJSON result: %v", err)
+	}
+
+	if _, ok := result["namespace"]; ok {
+		t.Error("ToMCPJSON() should not include namespace field")
+	}
+	if _, ok := result["version"]; ok {
+		t.Error("ToMCPJSON() should not include version field")
+	}
+
+	// Verify MCP fields are present
+	if result["name"] != "test-tool" {
+		t.Errorf("ToMCPJSON() name = %v, want %q", result["name"], "test-tool")
+	}
+	if result["description"] != "A test tool" {
+		t.Errorf("ToMCPJSON() description = %v, want %q", result["description"], "A test tool")
+	}
+}
+
+func TestTool_ToJSON(t *testing.T) {
+	tool := Tool{
+		Tool: mcp.Tool{
+			Name:        "test-tool",
+			Description: "A test tool",
+			InputSchema: map[string]any{
+				"type": "object",
+			},
+		},
+		Namespace: "test-ns",
+		Version:   "1.0.0",
+	}
+
+	data, err := tool.ToJSON()
+	if err != nil {
+		t.Fatalf("ToJSON() error = %v", err)
+	}
+
+	// Parse the JSON and verify all fields are present
+	var result map[string]any
+	if err := json.Unmarshal(data, &result); err != nil {
+		t.Fatalf("Failed to unmarshal ToJSON result: %v", err)
+	}
+
+	if result["namespace"] != "test-ns" {
+		t.Errorf("ToJSON() namespace = %v, want %q", result["namespace"], "test-ns")
+	}
+	if result["version"] != "1.0.0" {
+		t.Errorf("ToJSON() version = %v, want %q", result["version"], "1.0.0")
+	}
+	if result["name"] != "test-tool" {
+		t.Errorf("ToJSON() name = %v, want %q", result["name"], "test-tool")
+	}
+}
+
+func TestFromMCPJSON(t *testing.T) {
+	mcpJSON := `{
+		"name": "mcp-tool",
+		"description": "A tool from MCP",
+		"inputSchema": {"type": "object"}
+	}`
+
+	tool, err := FromMCPJSON([]byte(mcpJSON))
+	if err != nil {
+		t.Fatalf("FromMCPJSON() error = %v", err)
+	}
+
+	if tool.Name != "mcp-tool" {
+		t.Errorf("FromMCPJSON() name = %q, want %q", tool.Name, "mcp-tool")
+	}
+	if tool.Description != "A tool from MCP" {
+		t.Errorf("FromMCPJSON() description = %q, want %q", tool.Description, "A tool from MCP")
+	}
+	// Namespace and Version should be empty
+	if tool.Namespace != "" {
+		t.Errorf("FromMCPJSON() namespace = %q, want empty", tool.Namespace)
+	}
+	if tool.Version != "" {
+		t.Errorf("FromMCPJSON() version = %q, want empty", tool.Version)
+	}
+}
+
+func TestFromMCPJSON_InvalidJSON(t *testing.T) {
+	_, err := FromMCPJSON([]byte("not valid json"))
+	if err == nil {
+		t.Error("FromMCPJSON() with invalid JSON should return error")
+	}
+}
+
+func TestFromJSON(t *testing.T) {
+	toolJSON := `{
+		"name": "full-tool",
+		"description": "A full tool",
+		"inputSchema": {"type": "object"},
+		"namespace": "my-ns",
+		"version": "2.0.0"
+	}`
+
+	tool, err := FromJSON([]byte(toolJSON))
+	if err != nil {
+		t.Fatalf("FromJSON() error = %v", err)
+	}
+
+	if tool.Name != "full-tool" {
+		t.Errorf("FromJSON() name = %q, want %q", tool.Name, "full-tool")
+	}
+	if tool.Namespace != "my-ns" {
+		t.Errorf("FromJSON() namespace = %q, want %q", tool.Namespace, "my-ns")
+	}
+	if tool.Version != "2.0.0" {
+		t.Errorf("FromJSON() version = %q, want %q", tool.Version, "2.0.0")
+	}
+}
+
+func TestFromJSON_InvalidJSON(t *testing.T) {
+	_, err := FromJSON([]byte("not valid json"))
+	if err == nil {
+		t.Error("FromJSON() with invalid JSON should return error")
+	}
+}
+
+func TestJSON_RoundTrip(t *testing.T) {
+	original := Tool{
+		Tool: mcp.Tool{
+			Name:        "roundtrip-tool",
+			Description: "Testing round-trip",
+			InputSchema: map[string]any{
+				"type": "object",
+				"properties": map[string]any{
+					"foo": map[string]any{"type": "string"},
+				},
+			},
+		},
+		Namespace: "rt-ns",
+		Version:   "3.0.0",
+	}
+
+	// Round-trip through ToJSON/FromJSON
+	data, err := original.ToJSON()
+	if err != nil {
+		t.Fatalf("ToJSON() error = %v", err)
+	}
+
+	restored, err := FromJSON(data)
+	if err != nil {
+		t.Fatalf("FromJSON() error = %v", err)
+	}
+
+	if restored.Name != original.Name {
+		t.Errorf("Round-trip name = %q, want %q", restored.Name, original.Name)
+	}
+	if restored.Description != original.Description {
+		t.Errorf("Round-trip description = %q, want %q", restored.Description, original.Description)
+	}
+	if restored.Namespace != original.Namespace {
+		t.Errorf("Round-trip namespace = %q, want %q", restored.Namespace, original.Namespace)
+	}
+	if restored.Version != original.Version {
+		t.Errorf("Round-trip version = %q, want %q", restored.Version, original.Version)
+	}
+}
+
+func TestMCPJSON_RoundTrip(t *testing.T) {
+	original := Tool{
+		Tool: mcp.Tool{
+			Name:        "mcp-roundtrip",
+			Description: "Testing MCP round-trip",
+			InputSchema: map[string]any{
+				"type": "object",
+			},
+		},
+		Namespace: "will-be-lost",
+		Version:   "also-lost",
+	}
+
+	// Round-trip through ToMCPJSON/FromMCPJSON
+	data, err := original.ToMCPJSON()
+	if err != nil {
+		t.Fatalf("ToMCPJSON() error = %v", err)
+	}
+
+	restored, err := FromMCPJSON(data)
+	if err != nil {
+		t.Fatalf("FromMCPJSON() error = %v", err)
+	}
+
+	// MCP fields should be preserved
+	if restored.Name != original.Name {
+		t.Errorf("MCP round-trip name = %q, want %q", restored.Name, original.Name)
+	}
+	if restored.Description != original.Description {
+		t.Errorf("MCP round-trip description = %q, want %q", restored.Description, original.Description)
+	}
+
+	// Namespace and Version should be empty (stripped by ToMCPJSON)
+	if restored.Namespace != "" {
+		t.Errorf("MCP round-trip namespace = %q, want empty (stripped)", restored.Namespace)
+	}
+	if restored.Version != "" {
+		t.Errorf("MCP round-trip version = %q, want empty (stripped)", restored.Version)
 	}
 }

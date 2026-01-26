@@ -1,6 +1,7 @@
 package toolmodel
 
 import (
+	"encoding/json"
 	"errors"
 	"strings"
 
@@ -108,4 +109,35 @@ func ParseToolID(id string) (namespace, name string, err error) {
 	}
 
 	return namespace, name, nil
+}
+
+// ToMCPJSON serializes the Tool to JSON that is compatible with the MCP Tool spec.
+// This strips toolmodel-specific fields (Namespace, Version) and returns only
+// the standard MCP Tool fields.
+func (t *Tool) ToMCPJSON() ([]byte, error) {
+	return json.Marshal(t.Tool)
+}
+
+// ToJSON serializes the full Tool (including toolmodel extensions) to JSON.
+func (t *Tool) ToJSON() ([]byte, error) {
+	return json.Marshal(t)
+}
+
+// FromMCPJSON deserializes an MCP Tool JSON into a Tool struct.
+// The Namespace and Version fields will be empty after this call.
+func FromMCPJSON(data []byte) (*Tool, error) {
+	var mcpTool mcp.Tool
+	if err := json.Unmarshal(data, &mcpTool); err != nil {
+		return nil, err
+	}
+	return &Tool{Tool: mcpTool}, nil
+}
+
+// FromJSON deserializes a full Tool JSON (including toolmodel extensions) into a Tool struct.
+func FromJSON(data []byte) (*Tool, error) {
+	var tool Tool
+	if err := json.Unmarshal(data, &tool); err != nil {
+		return nil, err
+	}
+	return &tool, nil
 }

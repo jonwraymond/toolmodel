@@ -83,16 +83,16 @@ Gate: go test ./...
 - [x] Define BackendKind, ToolBackend, MCPBackend, ProviderBackend, and LocalBackend.
 - [x] Evaluate the official MCP Go SDK for Tool definitions/constants; prefer type aliasing, else thin wrapper, else mirror; document the decision and gaps.
 - [x] Implement ToolID and ParseToolID helpers with unit tests.
-- [ ] Implement JSON helpers (ToMCPJSON and FromMCPJSON) with MCP compatibility tests.
-- [ ] Implement SchemaValidator interface and default validator using jsonschema-go, enforcing MCP schema rules (2020-12 default, explicit draft-07, unsupported dialect errors, no external refs) with tests.
-- [ ] Add examples (examples_test.go) that demonstrate tool creation and validation.
+- [x] Implement JSON helpers (ToMCPJSON and FromMCPJSON) with MCP compatibility tests.
+- [x] Implement SchemaValidator interface and default validator using jsonschema-go, enforcing MCP schema rules (2020-12 default, explicit draft-07, unsupported dialect errors, no external refs) with tests.
+- [x] Add examples (examples_test.go) that demonstrate tool creation and validation.
 
 ## Success Criteria
-- [ ] All Gates pass.
-- [ ] All Functional Requirements are implemented.
-- [ ] MCP JSON compatibility is verified by tests.
-- [ ] Default validator uses jsonschema-go while preserving the interface to allow swapping.
-- [ ] Unsupported $schema dialects return a deterministic error.
+- [x] All Gates pass.
+- [x] All Functional Requirements are implemented.
+- [x] MCP JSON compatibility is verified by tests.
+- [x] Default validator uses jsonschema-go while preserving the interface to allow swapping.
+- [x] Unsupported $schema dialects return a deterministic error.
 
 ## Open Questions
 - Do we want to allow opt-in external $ref loaders, or keep external refs permanently disallowed in toolmodel?
