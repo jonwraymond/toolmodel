@@ -79,10 +79,10 @@ Gate: go test ./...
 
 ## Tasks
 - [x] Initialize Go module and package skeleton for toolmodel (doc.go with package comment).
-- [ ] Define Tool and ToolIcon types matching MCP Tool fields plus Namespace and Version.
-- [ ] Define BackendKind, ToolBackend, MCPBackend, ProviderBackend, and LocalBackend.
-- [ ] Evaluate the official MCP Go SDK for Tool definitions/constants; prefer type aliasing, else thin wrapper, else mirror; document the decision and gaps.
-- [ ] Implement ToolID and ParseToolID helpers with unit tests.
+- [x] Define Tool and ToolIcon types matching MCP Tool fields plus Namespace and Version.
+- [x] Define BackendKind, ToolBackend, MCPBackend, ProviderBackend, and LocalBackend.
+- [x] Evaluate the official MCP Go SDK for Tool definitions/constants; prefer type aliasing, else thin wrapper, else mirror; document the decision and gaps.
+- [x] Implement ToolID and ParseToolID helpers with unit tests.
 - [ ] Implement JSON helpers (ToMCPJSON and FromMCPJSON) with MCP compatibility tests.
 - [ ] Implement SchemaValidator interface and default validator using jsonschema-go, enforcing MCP schema rules (2020-12 default, explicit draft-07, unsupported dialect errors, no external refs) with tests.
 - [ ] Add examples (examples_test.go) that demonstrate tool creation and validation.
