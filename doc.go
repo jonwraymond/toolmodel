@@ -13,6 +13,7 @@
 // The package enforces MCP schema rules by default:
 //
 //   - inputSchema MUST be a valid JSON Schema object
+//   - Schemas may be provided as map[string]any, json.RawMessage, or []byte
 //   - JSON Schema 2020-12 is assumed when no $schema is present
 //   - External $ref resolution is disabled to prevent network access
 //

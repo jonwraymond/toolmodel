@@ -1,4 +1,4 @@
-module github.com/jraymond/toolmodel
+module github.com/jonwraymond/toolmodel
 
 go 1.24.4
 

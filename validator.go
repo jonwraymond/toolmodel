@@ -114,6 +114,24 @@ func (v *DefaultValidator) toJSONSchema(schema any) (*jsonschema.Schema, error) 
 		return s, nil
 	case jsonschema.Schema:
 		return &s, nil
+	case json.RawMessage:
+		if len(s) == 0 {
+			return nil, fmt.Errorf("%w: empty schema", ErrInvalidSchema)
+		}
+		var jsSchema jsonschema.Schema
+		if err := json.Unmarshal(s, &jsSchema); err != nil {
+			return nil, fmt.Errorf("%w: failed to parse schema: %v", ErrInvalidSchema, err)
+		}
+		return &jsSchema, nil
+	case []byte:
+		if len(s) == 0 {
+			return nil, fmt.Errorf("%w: empty schema", ErrInvalidSchema)
+		}
+		var jsSchema jsonschema.Schema
+		if err := json.Unmarshal(s, &jsSchema); err != nil {
+			return nil, fmt.Errorf("%w: failed to parse schema: %v", ErrInvalidSchema, err)
+		}
+		return &jsSchema, nil
 	case map[string]any:
 		// Marshal to JSON and unmarshal to jsonschema.Schema
 		data, err := json.Marshal(s)

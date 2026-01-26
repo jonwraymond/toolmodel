@@ -1,6 +1,7 @@
 package toolmodel
 
 import (
+	"encoding/json"
 	"strings"
 	"testing"
 
@@ -284,6 +285,26 @@ func TestDefaultValidator_Validate_JsonschemaSchema(t *testing.T) {
 	}
 }
 
+func TestDefaultValidator_Validate_RawMessageSchema(t *testing.T) {
+	v := NewDefaultValidator()
+
+	schema := json.RawMessage(`{"type":"string"}`)
+	if err := v.Validate(schema, "ok"); err != nil {
+		t.Errorf("Validate() with json.RawMessage error = %v", err)
+	}
+	if err := v.Validate(schema, 123); err == nil {
+		t.Error("Validate() with json.RawMessage should fail for invalid instance")
+	}
+
+	rawBytes := []byte(`{"type":"integer"}`)
+	if err := v.Validate(rawBytes, 42); err != nil {
+		t.Errorf("Validate() with []byte error = %v", err)
+	}
+	if err := v.Validate(rawBytes, "nope"); err == nil {
+		t.Error("Validate() with []byte should fail for invalid instance")
+	}
+}
+
 func TestDefaultValidator_Validate_InvalidSchemaType(t *testing.T) {
 	v := NewDefaultValidator()
 
@@ -343,6 +364,25 @@ func TestDefaultValidator_ValidateInput(t *testing.T) {
 				t.Errorf("ValidateInput() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
+	}
+}
+
+func TestDefaultValidator_ValidateInput_RawMessageSchema(t *testing.T) {
+	v := NewDefaultValidator()
+
+	tool := Tool{
+		Tool: mcp.Tool{
+			Name:        "raw-schema-tool",
+			Description: "Tool with RawMessage schema",
+			InputSchema: json.RawMessage(`{"type":"object","properties":{"q":{"type":"string"}},"required":["q"]}`),
+		},
+	}
+
+	if err := v.ValidateInput(&tool, map[string]any{"q": "ok"}); err != nil {
+		t.Errorf("ValidateInput() with RawMessage schema error = %v", err)
+	}
+	if err := v.ValidateInput(&tool, map[string]any{"q": 123}); err == nil {
+		t.Error("ValidateInput() with RawMessage schema should fail for invalid input")
 	}
 }
 

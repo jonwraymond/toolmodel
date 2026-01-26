@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/jraymond/toolmodel"
+	"github.com/jonwraymond/toolmodel"
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 )
 
