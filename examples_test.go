@@ -86,7 +86,9 @@ func Example_toolJSON() {
 	mcpJSON, _ := tool.ToMCPJSON()
 	fmt.Println("MCP JSON (no namespace/version):")
 	var mcpResult map[string]any
-	json.Unmarshal(mcpJSON, &mcpResult)
+	if err := json.Unmarshal(mcpJSON, &mcpResult); err != nil {
+		log.Fatal(err)
+	}
 	_, hasNamespace := mcpResult["namespace"]
 	fmt.Printf("  Has namespace: %v\n", hasNamespace)
 
@@ -94,7 +96,9 @@ func Example_toolJSON() {
 	fullJSON, _ := tool.ToJSON()
 	fmt.Println("Full JSON (with namespace/version):")
 	var fullResult map[string]any
-	json.Unmarshal(fullJSON, &fullResult)
+	if err := json.Unmarshal(fullJSON, &fullResult); err != nil {
+		log.Fatal(err)
+	}
 	fmt.Printf("  namespace: %v\n", fullResult["namespace"])
 	fmt.Printf("  version: %v\n", fullResult["version"])
 	// Output:
