@@ -505,6 +505,154 @@ func TestMCPJSON_RoundTrip(t *testing.T) {
 	}
 }
 
+func TestMCPJSON_RoundTrip_AllMCPFields(t *testing.T) {
+	original := Tool{
+		Tool: mcp.Tool{
+			Meta: mcp.Meta{
+				"traceId": "abc123",
+			},
+			Annotations: &mcp.ToolAnnotations{
+				Title:           "Annotated Title",
+				ReadOnlyHint:    true,
+				IdempotentHint:  true,
+				DestructiveHint: boolPtr(false),
+			},
+			Name:        "full-mcp-tool",
+			Title:       "Display Title",
+			Description: "Full MCP tool coverage",
+			InputSchema: map[string]any{
+				"type": "object",
+				"properties": map[string]any{
+					"a": map[string]any{"type": "string"},
+				},
+			},
+			OutputSchema: map[string]any{
+				"type": "object",
+				"properties": map[string]any{
+					"ok": map[string]any{"type": "boolean"},
+				},
+			},
+			Icons: []mcp.Icon{
+				{Source: "https://example.com/icon.png", MIMEType: "image/png"},
+			},
+		},
+		Namespace: "ns",
+		Version:   "1.0.0",
+		Tags:      []string{"alpha"},
+	}
+
+	data, err := original.ToMCPJSON()
+	if err != nil {
+		t.Fatalf("ToMCPJSON() error = %v", err)
+	}
+
+	restored, err := FromMCPJSON(data)
+	if err != nil {
+		t.Fatalf("FromMCPJSON() error = %v", err)
+	}
+
+	if restored.Name != original.Name {
+		t.Errorf("name = %q, want %q", restored.Name, original.Name)
+	}
+	if restored.Title != original.Title {
+		t.Errorf("title = %q, want %q", restored.Title, original.Title)
+	}
+	if restored.Description != original.Description {
+		t.Errorf("description = %q, want %q", restored.Description, original.Description)
+	}
+	if restored.Annotations == nil || restored.Annotations.Title != original.Annotations.Title {
+		t.Errorf("annotations title = %#v, want %#v", restored.Annotations, original.Annotations)
+	}
+	if restored.Meta.GetMeta()["traceId"] != "abc123" {
+		t.Errorf("meta traceId = %v, want %q", restored.Meta.GetMeta()["traceId"], "abc123")
+	}
+	if len(restored.Icons) != 1 || restored.Icons[0].Source != original.Icons[0].Source {
+		t.Errorf("icons = %#v, want %#v", restored.Icons, original.Icons)
+	}
+	if restored.Namespace != "" || restored.Version != "" || len(restored.Tags) != 0 {
+		t.Errorf("non-MCP fields should be stripped: namespace=%q version=%q tags=%v",
+			restored.Namespace, restored.Version, restored.Tags)
+	}
+}
+
+func TestToolValidate(t *testing.T) {
+	valid := Tool{
+		Tool: mcp.Tool{
+			Name:        "ok",
+			Description: "desc",
+			InputSchema: map[string]any{"type": "object"},
+		},
+	}
+	if err := valid.Validate(); err != nil {
+		t.Fatalf("Validate() unexpected error: %v", err)
+	}
+
+	missingName := Tool{
+		Tool: mcp.Tool{
+			Name:        "",
+			Description: "desc",
+			InputSchema: map[string]any{"type": "object"},
+		},
+	}
+	if err := missingName.Validate(); err == nil {
+		t.Fatal("Validate() expected error for empty name")
+	}
+
+	missingSchema := Tool{
+		Tool: mcp.Tool{
+			Name:        "no-schema",
+			Description: "desc",
+			InputSchema: nil,
+		},
+	}
+	if err := missingSchema.Validate(); err == nil {
+		t.Fatal("Validate() expected error for nil InputSchema")
+	}
+}
+
+func boolPtr(v bool) *bool {
+	return &v
+}
+
+func TestToolValidate_NameRules(t *testing.T) {
+	tooLong := strings.Repeat("a", 129)
+	invalidChars := "bad:name"
+
+	tests := []struct {
+		name string
+		tool Tool
+	}{
+		{
+			name: "too long name",
+			tool: Tool{
+				Tool: mcp.Tool{
+					Name:        tooLong,
+					Description: "desc",
+					InputSchema: map[string]any{"type": "object"},
+				},
+			},
+		},
+		{
+			name: "invalid chars",
+			tool: Tool{
+				Tool: mcp.Tool{
+					Name:        invalidChars,
+					Description: "desc",
+					InputSchema: map[string]any{"type": "object"},
+				},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := tt.tool.Validate(); err == nil {
+				t.Fatalf("Validate() expected error for %s", tt.name)
+			}
+		})
+	}
+}
+
 func TestNormalizeTags(t *testing.T) {
 	tests := []struct {
 		name string

@@ -1,5 +1,6 @@
 // Package toolmodel provides a single, canonical data model for tools in the system,
 // based on the MCP Tool specification (2025-11-25).
+// Target protocol version: MCPVersion.
 //
 // This package is the only place that defines what a "tool" is (fields, constraints, IDs),
 // and all downstream modules depend on it for tool definitions. It provides:
@@ -21,4 +22,6 @@
 //
 // This package has no networking or JSON-RPC dependencies and is safe to embed
 // in public APIs.
+//
+// Tool name validation mirrors MCP rules: 1-128 chars, [A-Za-z0-9_.-] only.
 package toolmodel

@@ -3,6 +3,7 @@ package toolmodel
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
@@ -10,6 +11,15 @@ import (
 
 // ErrInvalidToolID is returned when a tool ID string is malformed.
 var ErrInvalidToolID = errors.New("invalid tool ID format")
+var ErrInvalidTool = errors.New("invalid tool")
+
+const (
+	maxToolNameLen = 128
+)
+
+// MCPVersion is the MCP protocol version this package targets.
+// Keep in sync with the latest MCP spec.
+const MCPVersion = "2025-11-25"
 
 // Decision Log:
 // We evaluate the official MCP Go SDK (github.com/modelcontextprotocol/go-sdk/mcp)
@@ -171,6 +181,41 @@ func ParseToolID(id string) (namespace, name string, err error) {
 	}
 
 	return namespace, name, nil
+}
+
+// Validate checks basic invariants of Tool required by toolmodel consumers.
+// It does not validate JSON schemas; use SchemaValidator for that.
+func (t *Tool) Validate() error {
+	if t.Name == "" {
+		return fmt.Errorf("%w: name is required", ErrInvalidTool)
+	}
+	if len(t.Name) > maxToolNameLen {
+		return fmt.Errorf("%w: name exceeds %d characters", ErrInvalidTool, maxToolNameLen)
+	}
+	var invalidChars []string
+	seen := make(map[rune]bool)
+	for _, r := range t.Name {
+		if !validToolNameRune(r) {
+			if !seen[r] {
+				invalidChars = append(invalidChars, string(r))
+				seen[r] = true
+			}
+		}
+	}
+	if len(invalidChars) > 0 {
+		return fmt.Errorf("%w: name contains invalid characters: %s", ErrInvalidTool, strings.Join(invalidChars, ", "))
+	}
+	if t.InputSchema == nil {
+		return fmt.Errorf("%w: inputSchema is required", ErrInvalidTool)
+	}
+	return nil
+}
+
+func validToolNameRune(r rune) bool {
+	return (r >= 'a' && r <= 'z') ||
+		(r >= 'A' && r <= 'Z') ||
+		(r >= '0' && r <= '9') ||
+		r == '_' || r == '-' || r == '.'
 }
 
 // ToMCPJSON serializes the Tool to JSON that is compatible with the MCP Tool spec.

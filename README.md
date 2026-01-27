@@ -1,6 +1,6 @@
 # toolmodel
 
-Canonical Go data model for MCP-style tools. This module defines tool schemas, stable IDs, backend bindings, and JSON Schema validation helpers. It is the base dependency for other tool libraries (toolindex, tooldocs, toolrun, toolcode).
+Canonical Go data model for MCP-style tools. This module defines tool schemas, stable IDs, backend bindings, and JSON Schema validation helpers. It is the base dependency for other tool libraries (toolindex, tooldocs, toolrun, toolcode). Target MCP protocol version: 2025-11-25.
 
 ## Project Layout
 This module follows the official Go guidance for simple packages:
@@ -17,3 +17,10 @@ References: the Go team’s “Organizing a Go module” guide. ([go.dev](https:
 - Tag normalization helper: NormalizeTags
 - JSON Schema validation via `github.com/google/jsonschema-go/jsonschema`
 - External `$ref` resolution disabled by default
+
+## Tag Normalization
+Discovery layers should normalize tags on ingest:
+
+```go
+tool.Tags = toolmodel.NormalizeTags(tool.Tags)
+```
