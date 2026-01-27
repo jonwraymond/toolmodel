@@ -506,6 +506,7 @@ func TestDefaultValidator_LocalRef(t *testing.T) {
 }
 
 func TestSchemaValidator_Interface(t *testing.T) {
+	t.Helper()
 	// Ensure DefaultValidator implements SchemaValidator interface
 	var _ SchemaValidator = (*DefaultValidator)(nil)
 	var _ SchemaValidator = NewDefaultValidator()
