@@ -29,10 +29,72 @@ type Tool struct {
 	Namespace string `json:"namespace,omitempty"`
 	// Version is an optional version string for the tool.
 	Version string `json:"version,omitempty"`
+	// Tags is an optional set of search keywords for discovery layers (e.g. toolindex).
+	Tags []string `json:"tags,omitempty"`
 }
 
 // ToolIcon is an alias for mcp.Icon from the official SDK.
 type ToolIcon = mcp.Icon
+
+// NormalizeTags normalizes a list of tags for indexing/search.
+// Rules:
+// - lowercase
+// - trim whitespace
+// - replace internal whitespace with '-'
+// - allow only [a-z0-9-_.]
+// - dedupe while preserving order
+// - drop empty/invalid tags
+// - max tag length: 64 chars
+// - max tag count: 20
+func NormalizeTags(tags []string) []string {
+	const (
+		maxTagLen   = 64
+		maxTagCount = 20
+	)
+	seen := make(map[string]struct{}, len(tags))
+	out := make([]string, 0, len(tags))
+
+	for _, raw := range tags {
+		if len(out) >= maxTagCount {
+			break
+		}
+		t := strings.TrimSpace(strings.ToLower(raw))
+		if t == "" {
+			continue
+		}
+
+		// Replace any whitespace run with '-'
+		t = strings.Join(strings.Fields(t), "-")
+		if t == "" {
+			continue
+		}
+
+		// Filter to allowed characters.
+		b := make([]byte, 0, len(t))
+		for i := 0; i < len(t); i++ {
+			c := t[i]
+			if (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '-' || c == '_' || c == '.' {
+				b = append(b, c)
+			}
+		}
+		if len(b) == 0 {
+			continue
+		}
+		if len(b) > maxTagLen {
+			b = b[:maxTagLen]
+		}
+		normalized := string(b)
+		if normalized == "" {
+			continue
+		}
+		if _, ok := seen[normalized]; ok {
+			continue
+		}
+		seen[normalized] = struct{}{}
+		out = append(out, normalized)
+	}
+	return out
+}
 
 // BackendKind defines the type of backend backing a tool.
 type BackendKind string

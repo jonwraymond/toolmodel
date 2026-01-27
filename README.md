@@ -13,5 +13,7 @@ References: the Go team’s “Organizing a Go module” guide. ([go.dev](https:
 
 ## Status
 - MCP-compatible Tool model with provider/local backends
+- Optional tool Tags for discovery/search
+- Tag normalization helper: NormalizeTags
 - JSON Schema validation via `github.com/google/jsonschema-go/jsonschema`
 - External `$ref` resolution disabled by default

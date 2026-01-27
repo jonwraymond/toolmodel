@@ -2,6 +2,7 @@ package toolmodel
 
 import (
 	"encoding/json"
+	"strings"
 	"testing"
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
@@ -228,6 +229,7 @@ func TestTool_EmbedsMCPTool(t *testing.T) {
 		},
 		Namespace: "test",
 		Version:   "1.0.0",
+		Tags:      []string{"alpha", "beta"},
 	}
 
 	if tool.Name != "test-tool" {
@@ -241,6 +243,9 @@ func TestTool_EmbedsMCPTool(t *testing.T) {
 	}
 	if tool.Version != "1.0.0" {
 		t.Errorf("Version = %q, want %q", tool.Version, "1.0.0")
+	}
+	if len(tool.Tags) != 2 || tool.Tags[0] != "alpha" || tool.Tags[1] != "beta" {
+		t.Errorf("Tags = %#v, want %v", tool.Tags, []string{"alpha", "beta"})
 	}
 }
 
@@ -272,6 +277,7 @@ func TestTool_ToMCPJSON(t *testing.T) {
 		},
 		Namespace: "test-ns",
 		Version:   "1.0.0",
+		Tags:      []string{"search", "discovery"},
 	}
 
 	data, err := tool.ToMCPJSON()
@@ -290,6 +296,9 @@ func TestTool_ToMCPJSON(t *testing.T) {
 	}
 	if _, ok := result["version"]; ok {
 		t.Error("ToMCPJSON() should not include version field")
+	}
+	if _, ok := result["tags"]; ok {
+		t.Error("ToMCPJSON() should not include tags field")
 	}
 
 	// Verify MCP fields are present
@@ -312,6 +321,7 @@ func TestTool_ToJSON(t *testing.T) {
 		},
 		Namespace: "test-ns",
 		Version:   "1.0.0",
+		Tags:      []string{"a", "b"},
 	}
 
 	data, err := tool.ToJSON()
@@ -330,6 +340,9 @@ func TestTool_ToJSON(t *testing.T) {
 	}
 	if result["version"] != "1.0.0" {
 		t.Errorf("ToJSON() version = %v, want %q", result["version"], "1.0.0")
+	}
+	if tags, ok := result["tags"].([]any); !ok || len(tags) != 2 {
+		t.Errorf("ToJSON() tags = %v, want 2 tags", result["tags"])
 	}
 	if result["name"] != "test-tool" {
 		t.Errorf("ToJSON() name = %v, want %q", result["name"], "test-tool")
@@ -376,7 +389,8 @@ func TestFromJSON(t *testing.T) {
 		"description": "A full tool",
 		"inputSchema": {"type": "object"},
 		"namespace": "my-ns",
-		"version": "2.0.0"
+		"version": "2.0.0",
+		"tags": ["t1", "t2"]
 	}`
 
 	tool, err := FromJSON([]byte(toolJSON))
@@ -392,6 +406,9 @@ func TestFromJSON(t *testing.T) {
 	}
 	if tool.Version != "2.0.0" {
 		t.Errorf("FromJSON() version = %q, want %q", tool.Version, "2.0.0")
+	}
+	if len(tool.Tags) != 2 || tool.Tags[0] != "t1" || tool.Tags[1] != "t2" {
+		t.Errorf("FromJSON() tags = %#v, want %v", tool.Tags, []string{"t1", "t2"})
 	}
 }
 
@@ -416,6 +433,7 @@ func TestJSON_RoundTrip(t *testing.T) {
 		},
 		Namespace: "rt-ns",
 		Version:   "3.0.0",
+		Tags:      []string{"x", "y"},
 	}
 
 	// Round-trip through ToJSON/FromJSON
@@ -440,6 +458,9 @@ func TestJSON_RoundTrip(t *testing.T) {
 	}
 	if restored.Version != original.Version {
 		t.Errorf("Round-trip version = %q, want %q", restored.Version, original.Version)
+	}
+	if len(restored.Tags) != 2 || restored.Tags[0] != "x" || restored.Tags[1] != "y" {
+		t.Errorf("Round-trip tags = %#v, want %v", restored.Tags, []string{"x", "y"})
 	}
 }
 
@@ -481,5 +502,54 @@ func TestMCPJSON_RoundTrip(t *testing.T) {
 	}
 	if restored.Version != "" {
 		t.Errorf("MCP round-trip version = %q, want empty (stripped)", restored.Version)
+	}
+}
+
+func TestNormalizeTags(t *testing.T) {
+	tests := []struct {
+		name string
+		in   []string
+		want []string
+	}{
+		{
+			name: "basic normalization and dedupe",
+			in:   []string{"  Foo ", "foo", "Bar Baz", "bar-baz", "A_B", "A.B"},
+			want: []string{"foo", "bar-baz", "a_b", "a.b"},
+		},
+		{
+			name: "filters invalid characters and empties",
+			in:   []string{"", "   ", "###", "ok!", "good_tag"},
+			want: []string{"ok", "good_tag"},
+		},
+		{
+			name: "limits count and length",
+			in:   append([]string{"tag1"}, make([]string, 25)...),
+			want: []string{"tag1"},
+		},
+	}
+
+	t.Run("length truncation", func(t *testing.T) {
+		long := strings.Repeat("a", 100)
+		got := NormalizeTags([]string{long})
+		if len(got) != 1 {
+			t.Fatalf("expected 1 tag, got %d", len(got))
+		}
+		if len(got[0]) != 64 {
+			t.Fatalf("expected tag length 64, got %d", len(got[0]))
+		}
+	})
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := NormalizeTags(tt.in)
+			if len(got) != len(tt.want) {
+				t.Fatalf("NormalizeTags() len = %d, want %d (%v)", len(got), len(tt.want), got)
+			}
+			for i := range got {
+				if got[i] != tt.want[i] {
+					t.Fatalf("NormalizeTags()[%d] = %q, want %q", i, got[i], tt.want[i])
+				}
+			}
+		})
 	}
 }

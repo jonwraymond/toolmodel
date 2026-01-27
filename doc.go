@@ -7,8 +7,10 @@
 //   - Tool and ToolIcon types matching the MCP Tool specification
 //   - Namespace and Version extensions for stable tool identification
 //   - Backend binding types (MCP, Provider, Local) for execution metadata
+//   - Optional tool Tags for search/discovery layers
 //   - JSON Schema validation helpers for inputs and outputs
 //   - JSON serialization compatible with the MCP Tool spec
+//   - Tag normalization helpers for discovery layers
 //
 // The package enforces MCP schema rules by default:
 //
