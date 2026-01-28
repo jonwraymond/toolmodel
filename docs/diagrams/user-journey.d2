@@ -1,0 +1,44 @@
+direction: down
+
+style: { font-size: 14 }
+
+author: "Author" {
+  shape: oval
+}
+
+toolmodel: "toolmodel" {
+  shape: package
+  style: { shadow: true }
+}
+
+toolindex: "toolindex" {
+  shape: cylinder
+}
+
+tooldocs: "tooldocs" {
+  shape: document
+}
+
+toolrun: "toolrun" {
+  shape: step
+}
+
+metatools: "metatools-mcp" {
+  shape: hexagon
+}
+
+agent: "Agent" {
+  shape: oval
+}
+
+author -> toolmodel: "Define Tool + Schema"
+toolmodel -> toolindex: "Register Tool + Backend"
+
+agent -> metatools: "search_tools(query)"
+metatools -> toolindex: "Search"
+
+agent -> metatools: "describe_tool(tool_id, schema)"
+metatools -> tooldocs: "DescribeTool"
+
+agent -> metatools: "run_tool(tool_id, args)"
+metatools -> toolrun: "Run"

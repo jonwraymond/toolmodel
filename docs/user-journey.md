@@ -4,25 +4,7 @@ This journey shows how a tool definition flows from authoring to execution acros
 
 ## End-to-end flow (stack view)
 
-```mermaid
-sequenceDiagram
-  participant Author
-  participant ToolModel as toolmodel
-  participant Index as toolindex
-  participant Docs as tooldocs
-  participant Runner as toolrun
-  participant MCP as metatools-mcp
-  participant Agent
-
-  Author->>ToolModel: Define Tool (name, schema, namespace, tags)
-  ToolModel->>Index: Register Tool + Backend
-  Agent->>MCP: search_tools(query)
-  MCP->>Index: Search
-  Agent->>MCP: describe_tool(tool_id, schema)
-  MCP->>Docs: DescribeTool
-  Agent->>MCP: run_tool(tool_id, args)
-  MCP->>Runner: Run
-```
+![Diagram](assets/diagrams/user-journey.svg)
 
 ## Step-by-step
 

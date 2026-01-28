@@ -5,63 +5,21 @@ and uses it as the canonical source of truth.
 
 ## Component view
 
-```mermaid
-flowchart LR
-  A[toolmodel.Tool] --> B[toolindex]
-  A --> C[tooldocs]
-  A --> D[toolrun]
-  A --> E[metatools-mcp]
 
-  subgraph Binding
-    F[ToolBackend]
-  end
+![Diagram](assets/diagrams/component-view.svg)
 
-  F --> D
-```
 
 ## Data model view
 
-```mermaid
-classDiagram
-  class Tool {
-    +string Namespace
-    +string Name
-    +string Version
-    +[]string Tags
-    +ToolID() string
-  }
 
-  class ToolBackend {
-    +BackendKind Kind
-  }
+![Diagram](assets/diagrams/component-view.svg)
 
-  class MCPBackend {
-    +string ServerName
-  }
-
-  class ProviderBackend {
-    +string ProviderID
-    +string ToolID
-  }
-
-  class LocalBackend {
-    +string Name
-  }
-
-  ToolBackend --> MCPBackend
-  ToolBackend --> ProviderBackend
-  ToolBackend --> LocalBackend
-```
 
 ## Validation pipeline
 
-```mermaid
-flowchart LR
-  A[Tool.InputSchema] --> B[DefaultValidator]
-  B --> C[Resolve schema]
-  C --> D[Validate instance]
-  D --> E[Error or success]
-```
+
+![Diagram](assets/diagrams/validation-pipeline.svg)
+
 
 ## Design notes
 

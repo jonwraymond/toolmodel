@@ -1,0 +1,20 @@
+direction: right
+
+"toolmodel.Tool": { shape: package }
+ toolindex: { shape: cylinder }
+ tooldocs: { shape: document }
+ toolrun: { shape: step }
+ "metatools-mcp": { shape: hexagon }
+
+"toolmodel.Tool" -> toolindex
+"toolmodel.Tool" -> tooldocs
+"toolmodel.Tool" -> toolrun
+"toolmodel.Tool" -> "metatools-mcp"
+
+Binding: {
+  label: "Binding"
+  style: { border-radius: 8; shadow: true }
+  ToolBackend
+}
+
+ToolBackend -> toolrun
