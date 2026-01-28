@@ -70,3 +70,4 @@ func NewDefaultValidator() *DefaultValidator
 
 - `NormalizeTags([]string) []string`
 - `Tool.Validate() error`
+- `ToolBackend.Validate() error`

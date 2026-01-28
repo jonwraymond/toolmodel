@@ -285,6 +285,23 @@ func TestDefaultValidator_Validate_JsonschemaSchema(t *testing.T) {
 	}
 }
 
+func TestDefaultValidator_Validate_DoesNotMutateSchema(t *testing.T) {
+	v := NewDefaultValidator()
+
+	schema := &jsonschema.Schema{
+		Schema: SchemaDialectDraft07,
+		Type:   "string",
+	}
+
+	if err := v.Validate(schema, "ok"); err != nil {
+		t.Fatalf("Validate() error = %v", err)
+	}
+
+	if schema.Schema != SchemaDialectDraft07 {
+		t.Errorf("schema.Schema mutated: got %q, want %q", schema.Schema, SchemaDialectDraft07)
+	}
+}
+
 func TestDefaultValidator_Validate_RawMessageSchema(t *testing.T) {
 	v := NewDefaultValidator()
 

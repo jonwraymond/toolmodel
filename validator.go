@@ -111,7 +111,12 @@ func (v *DefaultValidator) ValidateOutput(tool *Tool, result any) error {
 func (v *DefaultValidator) toJSONSchema(schema any) (*jsonschema.Schema, error) {
 	switch s := schema.(type) {
 	case *jsonschema.Schema:
-		return s, nil
+		if s == nil {
+			return nil, fmt.Errorf("%w: nil schema", ErrInvalidSchema)
+		}
+		// Return a shallow copy to avoid mutating caller-owned schema objects.
+		copySchema := *s
+		return &copySchema, nil
 	case jsonschema.Schema:
 		return &s, nil
 	case json.RawMessage:

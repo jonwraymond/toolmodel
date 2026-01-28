@@ -2,6 +2,7 @@ package toolmodel
 
 import (
 	"encoding/json"
+	"errors"
 	"strings"
 	"testing"
 
@@ -10,9 +11,9 @@ import (
 
 func TestTool_ToolID(t *testing.T) {
 	tests := []struct {
-		name      string
-		tool      Tool
-		wantID    string
+		name   string
+		tool   Tool
+		wantID string
 	}{
 		{
 			name: "with namespace",
@@ -212,6 +213,97 @@ func TestToolBackend_Structures(t *testing.T) {
 			t.Errorf("Local.Name = %q, want %q", backend.Local.Name, "my-handler")
 		}
 	})
+}
+
+func TestToolBackend_Validate(t *testing.T) {
+	tests := []struct {
+		name    string
+		backend ToolBackend
+		wantErr bool
+	}{
+		{
+			name: "valid MCP backend",
+			backend: ToolBackend{
+				Kind: BackendKindMCP,
+				MCP:  &MCPBackend{ServerName: "server"},
+			},
+			wantErr: false,
+		},
+		{
+			name: "invalid MCP backend missing server name",
+			backend: ToolBackend{
+				Kind: BackendKindMCP,
+				MCP:  &MCPBackend{},
+			},
+			wantErr: true,
+		},
+		{
+			name: "valid Provider backend",
+			backend: ToolBackend{
+				Kind: BackendKindProvider,
+				Provider: &ProviderBackend{
+					ProviderID: "provider",
+					ToolID:     "tool",
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "invalid Provider backend missing ProviderID",
+			backend: ToolBackend{
+				Kind: BackendKindProvider,
+				Provider: &ProviderBackend{
+					ToolID: "tool",
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "invalid Provider backend missing ToolID",
+			backend: ToolBackend{
+				Kind: BackendKindProvider,
+				Provider: &ProviderBackend{
+					ProviderID: "provider",
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "valid Local backend",
+			backend: ToolBackend{
+				Kind:  BackendKindLocal,
+				Local: &LocalBackend{Name: "handler"},
+			},
+			wantErr: false,
+		},
+		{
+			name: "invalid Local backend missing Name",
+			backend: ToolBackend{
+				Kind:  BackendKindLocal,
+				Local: &LocalBackend{},
+			},
+			wantErr: true,
+		},
+		{
+			name: "unknown backend kind",
+			backend: ToolBackend{
+				Kind: "unknown",
+			},
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.backend.Validate()
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("Validate() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if tt.wantErr && err != nil && !errors.Is(err, ErrInvalidBackend) {
+				t.Fatalf("expected ErrInvalidBackend, got %v", err)
+			}
+		})
+	}
 }
 
 func TestTool_EmbedsMCPTool(t *testing.T) {

@@ -12,6 +12,7 @@ import (
 // ErrInvalidToolID is returned when a tool ID string is malformed.
 var ErrInvalidToolID = errors.New("invalid tool ID format")
 var ErrInvalidTool = errors.New("invalid tool")
+var ErrInvalidBackend = errors.New("invalid backend")
 
 const (
 	maxToolNameLen = 128
@@ -207,6 +208,33 @@ func (t *Tool) Validate() error {
 	}
 	if t.InputSchema == nil {
 		return fmt.Errorf("%w: inputSchema is required", ErrInvalidTool)
+	}
+	return nil
+}
+
+// Validate checks basic invariants of ToolBackend.
+func (b ToolBackend) Validate() error {
+	switch b.Kind {
+	case BackendKindMCP:
+		if b.MCP == nil || b.MCP.ServerName == "" {
+			return fmt.Errorf("%w: MCP backend requires ServerName", ErrInvalidBackend)
+		}
+	case BackendKindProvider:
+		if b.Provider == nil {
+			return fmt.Errorf("%w: Provider backend requires Provider details", ErrInvalidBackend)
+		}
+		if b.Provider.ProviderID == "" {
+			return fmt.Errorf("%w: Provider backend requires ProviderID", ErrInvalidBackend)
+		}
+		if b.Provider.ToolID == "" {
+			return fmt.Errorf("%w: Provider backend requires ToolID", ErrInvalidBackend)
+		}
+	case BackendKindLocal:
+		if b.Local == nil || b.Local.Name == "" {
+			return fmt.Errorf("%w: Local backend requires Name", ErrInvalidBackend)
+		}
+	default:
+		return fmt.Errorf("%w: unknown backend kind %q", ErrInvalidBackend, b.Kind)
 	}
 	return nil
 }
