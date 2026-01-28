@@ -1,5 +1,7 @@
 # toolmodel
 
+[![Docs](https://img.shields.io/badge/docs-ai--tools--stack-blue)](https://jonwraymond.github.io/ai-tools-stack/)
+
 `toolmodel` is the canonical, MCP-aligned data model for tools across this
 stack. It defines:
 - what a tool is,

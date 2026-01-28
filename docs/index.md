@@ -69,3 +69,7 @@ func main() {
 - Additional examples: `examples.md`
 - Design Notes: `design-notes.md`
 - User Journey: `user-journey.md`
+
+!!! note "Deep dives"
+    - Design Notes: `design-notes.md`
+    - User Journey: `user-journey.md`
