@@ -4,6 +4,12 @@
 It embeds the official MCP Go SDK `mcp.Tool`, adds namespace + tags, and provides
 schema validation helpers.
 
+[![Docs](https://img.shields.io/badge/docs-ai--tools--stack-blue)](https://jonwraymond.github.io/ai-tools-stack/)
+
+## Deep dives
+- Design Notes: `design-notes.md`
+- User Journey: `user-journey.md`
+
 ## Motivation
 
 - **Single source of truth** for tool schemas and IDs
@@ -70,6 +76,3 @@ func main() {
 - Design Notes: `design-notes.md`
 - User Journey: `user-journey.md`
 
-!!! note "Deep dives"
-    - Design Notes: `design-notes.md`
-    - User Journey: `user-journey.md`
