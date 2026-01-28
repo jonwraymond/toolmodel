@@ -67,3 +67,5 @@ func main() {
 - Architecture and placement in the stack: `architecture.md`
 - Usage patterns and validation: `usage.md`
 - Additional examples: `examples.md`
+- Design Notes: `design-notes.md`
+- User Journey: `user-journey.md`
