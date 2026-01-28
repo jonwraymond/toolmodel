@@ -53,6 +53,16 @@ classDiagram
   ToolBackend --> LocalBackend
 ```
 
+## Validation pipeline
+
+```mermaid
+flowchart LR
+  A[Tool.InputSchema] --> B[DefaultValidator]
+  B --> C[Resolve schema]
+  C --> D[Validate instance]
+  D --> E[Error or success]
+```
+
 ## Design notes
 
 - Embeds `mcp.Tool` to stay aligned with the official MCP SDK.

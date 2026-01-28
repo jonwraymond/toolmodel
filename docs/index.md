@@ -4,6 +4,12 @@
 It embeds the official MCP Go SDK `mcp.Tool`, adds namespace + tags, and provides
 schema validation helpers.
 
+## Motivation
+
+- **Single source of truth** for tool schemas and IDs
+- **Protocol alignment** by embedding the official MCP SDK type
+- **Safe validation** with deterministic, dependency-light JSON Schema checks
+
 ## Key APIs
 
 - `Tool` (embeds `mcp.Tool`, adds `Namespace`, `Version`, `Tags`)
@@ -49,6 +55,12 @@ func main() {
   fmt.Println(tool.ToolID()) // github:get_repo
 }
 ```
+
+## Usability notes
+
+- `InputSchema`/`OutputSchema` accept `map[string]any` or JSON bytes
+- Tags are normalized for search (`toolindex` + `toolsearch`)
+- Canonical IDs are stable and human-friendly
 
 ## Next
 
