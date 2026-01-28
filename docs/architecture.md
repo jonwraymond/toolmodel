@@ -1,6 +1,9 @@
 # Architecture
 
-`toolmodel` sits at the bottom of the stack. Everything else consumes its types.
+`toolmodel` sits at the bottom of the stack. Everything else consumes its types
+and uses it as the canonical source of truth.
+
+## Component view
 
 ```mermaid
 flowchart LR
@@ -16,8 +19,42 @@ flowchart LR
   F --> D
 ```
 
-## Key decisions
+## Data model view
 
-- Embeds the official MCP Go SDK `mcp.Tool` for 1:1 protocol alignment.
+```mermaid
+classDiagram
+  class Tool {
+    +string Namespace
+    +string Name
+    +string Version
+    +[]string Tags
+    +ToolID() string
+  }
+
+  class ToolBackend {
+    +BackendKind Kind
+  }
+
+  class MCPBackend {
+    +string ServerName
+  }
+
+  class ProviderBackend {
+    +string ProviderID
+    +string ToolID
+  }
+
+  class LocalBackend {
+    +string Name
+  }
+
+  ToolBackend --> MCPBackend
+  ToolBackend --> ProviderBackend
+  ToolBackend --> LocalBackend
+```
+
+## Design notes
+
+- Embeds `mcp.Tool` to stay aligned with the official MCP SDK.
 - Adds `Namespace`, `Version`, and `Tags` without altering MCP semantics.
-- Keeps validation local and dependency-light (`jsonschema-go`).
+- Keeps validation dependency-light and deterministic.

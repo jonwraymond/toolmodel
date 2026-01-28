@@ -16,7 +16,7 @@ tool := toolmodel.Tool{
     InputSchema: map[string]any{
       "type": "object",
       "properties": map[string]any{
-        "title": {"type": "string"},
+        "title":    {"type": "string"},
         "priority": {"type": "string", "enum": []string{"low", "high"}},
       },
       "required": []string{"title"},

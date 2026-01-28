@@ -1,16 +1,15 @@
 # toolmodel
 
 `toolmodel` is the canonical, MCP-aligned data model for tools across the stack.
-It embeds the official MCP Go SDK `mcp.Tool`, adds namespace and tagging, and
-provides validation helpers for JSON Schema inputs/outputs.
+It embeds the official MCP Go SDK `mcp.Tool`, adds namespace + tags, and provides
+schema validation helpers.
 
-## What this library provides
+## Key APIs
 
-- Canonical tool definition (`toolmodel.Tool`)
-- Stable IDs (`Tool.ToolID()` + `ParseToolID`)
-- Backend bindings (`ToolBackend`) for execution layers
-- Tag normalization for discovery (`NormalizeTags`)
-- JSON Schema validation via `SchemaValidator`
+- `Tool` (embeds `mcp.Tool`, adds `Namespace`, `Version`, `Tags`)
+- `ToolBackend` (mcp/provider/local binding)
+- `SchemaValidator` + `NewDefaultValidator()`
+- `NormalizeTags`, `ToolID`, `ParseToolID`
 
 ## Quickstart
 
@@ -54,5 +53,5 @@ func main() {
 ## Next
 
 - Architecture and placement in the stack: `architecture.md`
-- How to use tags, backends, and validation: `usage.md`
+- Usage patterns and validation: `usage.md`
 - Additional examples: `examples.md`
