@@ -7,8 +7,8 @@ schema validation helpers.
 [![Docs](https://img.shields.io/badge/docs-ai--tools--stack-blue)](https://jonwraymond.github.io/ai-tools-stack/)
 
 ## Deep dives
-- Design Notes: `design-notes.md`
-- User Journey: `user-journey.md`
+- Design Notes: [design-notes.md](design-notes.md)
+- User Journey: [user-journey.md](user-journey.md)
 
 ## Motivation
 
@@ -73,6 +73,6 @@ func main() {
 - Architecture and placement in the stack: `architecture.md`
 - Usage patterns and validation: `usage.md`
 - Additional examples: `examples.md`
-- Design Notes: `design-notes.md`
-- User Journey: `user-journey.md`
+- Design Notes: [design-notes.md](design-notes.md)
+- User Journey: [user-journey.md](user-journey.md)
 
