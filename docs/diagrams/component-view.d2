@@ -1,20 +1,135 @@
+# toolmodel Component View
+# How toolmodel.Tool flows to other components
+
 direction: right
 
-"toolmodel.Tool": { shape: package }
- toolindex: { shape: cylinder }
- tooldocs: { shape: document }
- toolrun: { shape: step }
- "metatools-mcp": { shape: hexagon }
-
-"toolmodel.Tool" -> toolindex
-"toolmodel.Tool" -> tooldocs
-"toolmodel.Tool" -> toolrun
-"toolmodel.Tool" -> "metatools-mcp"
-
-Binding: {
-  label: "Binding"
-  style: { border-radius: 8; shadow: true }
-  ToolBackend
+vars: {
+  d2-config: {
+    layout-engine: elk
+    theme-id: 0
+  }
+  foundation-fill: "#718096"
+  discovery-fill: "#3182ce"
+  execution-fill: "#38a169"
+  surface-fill: "#2b6cb0"
 }
 
-ToolBackend -> toolrun
+classes: {
+  container: {
+    style: {
+      border-radius: 12
+      shadow: true
+      font-size: 14
+      bold: true
+    }
+  }
+  foundation-node: {
+    style: {
+      fill: ${foundation-fill}
+      stroke: "#4a5568"
+      stroke-width: 2
+      font-color: "#fff"
+      shadow: true
+    }
+  }
+  discovery-node: {
+    style: {
+      fill: ${discovery-fill}
+      stroke: "#2c5282"
+      stroke-width: 2
+      font-color: "#fff"
+    }
+  }
+  execution-node: {
+    style: {
+      fill: ${execution-fill}
+      stroke: "#276749"
+      stroke-width: 2
+      font-color: "#fff"
+    }
+  }
+  surface-node: {
+    style: {
+      fill: ${surface-fill}
+      stroke: "#1a365d"
+      stroke-width: 2
+      font-color: "#fff"
+    }
+  }
+  data-flow: {
+    style: {
+      stroke: "#4a5568"
+      stroke-width: 2
+    }
+  }
+}
+
+# Title
+title: "toolmodel - Component View" {
+  shape: text
+  near: top-center
+  style: {
+    font-size: 24
+    bold: true
+    font-color: "#1a365d"
+  }
+}
+
+# Core Model
+tool: "📋 toolmodel.Tool\nCanonical Schema" {
+  shape: package
+  class: foundation-node
+}
+
+# Consumers
+toolindex: "🗂️ toolindex\nRegistry" {
+  shape: cylinder
+  class: discovery-node
+}
+
+tooldocs: "📚 tooldocs\nDocs" {
+  shape: document
+  class: discovery-node
+}
+
+toolrun: "▶️ toolrun\nExec" {
+  shape: step
+  class: execution-node
+}
+
+metatools: "🔷 metatools-mcp\nSurface" {
+  shape: hexagon
+  class: surface-node
+}
+
+# Binding
+binding: "🔗 Binding" {
+  class: container
+  style: {
+    fill: "#f7fafc"
+    stroke: "#718096"
+  }
+
+  backend: "ToolBackend\nLocal/Provider/MCP" {
+    shape: step
+    class: foundation-node
+  }
+}
+
+# Connections
+tool -> toolindex: "register" {
+  class: data-flow
+}
+tool -> tooldocs: "document" {
+  class: data-flow
+}
+tool -> toolrun: "execute" {
+  class: data-flow
+}
+tool -> metatools: "expose" {
+  class: data-flow
+}
+
+binding.backend -> toolrun: "dispatch" {
+  class: data-flow
+}

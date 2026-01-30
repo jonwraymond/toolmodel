@@ -1,44 +1,151 @@
+# toolmodel User Journey
+# Tool authoring to execution flow
+
 direction: down
 
-style: { font-size: 14 }
-
-author: "Author" {
-  shape: oval
+vars: {
+  d2-config: {
+    layout-engine: elk
+    theme-id: 0
+  }
+  foundation-fill: "#718096"
+  discovery-fill: "#3182ce"
+  surface-fill: "#2b6cb0"
+  execution-fill: "#38a169"
+  actor-fill: "#e2e8f0"
 }
 
-toolmodel: "toolmodel" {
+classes: {
+  actor: {
+    style: {
+      fill: ${actor-fill}
+      stroke: "#a0aec0"
+      stroke-width: 2
+      font-color: "#1a202c"
+      bold: true
+    }
+  }
+  foundation: {
+    style: {
+      fill: ${foundation-fill}
+      stroke: "#4a5568"
+      stroke-width: 2
+      font-color: "#fff"
+      shadow: true
+    }
+  }
+  discovery: {
+    style: {
+      fill: ${discovery-fill}
+      stroke: "#2c5282"
+      stroke-width: 2
+      font-color: "#fff"
+    }
+  }
+  surface: {
+    style: {
+      fill: ${surface-fill}
+      stroke: "#1a365d"
+      stroke-width: 2
+      font-color: "#fff"
+    }
+  }
+  execution: {
+    style: {
+      fill: ${execution-fill}
+      stroke: "#276749"
+      stroke-width: 2
+      font-color: "#fff"
+    }
+  }
+  author-flow: {
+    style: {
+      stroke: ${foundation-fill}
+      stroke-width: 2
+    }
+  }
+  agent-flow: {
+    style: {
+      stroke: ${surface-fill}
+      stroke-width: 2
+    }
+  }
+}
+
+# Title
+title: "toolmodel - Tool Lifecycle" {
+  shape: text
+  near: top-center
+  style: {
+    font-size: 24
+    bold: true
+    font-color: "#1a365d"
+  }
+}
+
+# Actors
+author: "👤 Author" {
+  shape: person
+  class: actor
+}
+
+agent: "🤖 Agent" {
+  shape: person
+  class: actor
+}
+
+# Components
+toolmodel: "📦 toolmodel\nDefine Tool + Schema" {
   shape: package
-  style: { shadow: true }
+  class: foundation
 }
 
-toolindex: "toolindex" {
+toolindex: "🗂️ toolindex\nRegister + Backend" {
   shape: cylinder
+  class: discovery
 }
 
-tooldocs: "tooldocs" {
+tooldocs: "📚 tooldocs\nDocumentation" {
   shape: document
+  class: discovery
 }
 
-toolrun: "toolrun" {
-  shape: step
-}
-
-metatools: "metatools-mcp" {
+metatools: "🔷 metatools-mcp\nMCP Surface" {
   shape: hexagon
+  class: surface
 }
 
-agent: "Agent" {
-  shape: oval
+toolrun: "▶️ toolrun\nExecution" {
+  shape: step
+  class: execution
 }
 
-author -> toolmodel: "Define Tool + Schema"
-toolmodel -> toolindex: "Register Tool + Backend"
+# Author Flow
+author -> toolmodel: "Define Tool + Schema" {
+  class: author-flow
+}
+toolmodel -> toolindex: "Register Tool + Backend" {
+  class: author-flow
+}
 
-agent -> metatools: "search_tools(query)"
-metatools -> toolindex: "Search"
+# Agent Flow
+agent -> metatools: "search_tools(query)" {
+  class: agent-flow
+}
+metatools -> toolindex: "Search" {
+  class: agent-flow
+}
 
-agent -> metatools: "describe_tool(tool_id, schema)"
-metatools -> tooldocs: "DescribeTool"
+agent -> metatools: "describe_tool(id, schema)" {
+  class: agent-flow
+}
+metatools -> tooldocs: "DescribeTool" {
+  class: agent-flow
+}
 
-agent -> metatools: "run_tool(tool_id, args)"
-metatools -> toolrun: "Run"
+agent -> metatools: "run_tool(id, args)" {
+  class: agent-flow
+}
+metatools -> toolrun: "Run" {
+  class: agent-flow
+}
