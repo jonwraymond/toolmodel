@@ -30,6 +30,14 @@ const (
 )
 
 // SchemaValidator validates JSON instances against JSON Schemas.
+//
+// Contract:
+//   - Thread-safety: implementations must be safe for concurrent use unless documented otherwise.
+//   - Ownership: implementations must not mutate caller-owned schema objects or instances.
+//   - Errors: validation failures should wrap/return ErrInvalidSchema or ErrUnsupportedSchema where appropriate.
+//   - ValidateInput: must validate against tool.InputSchema; return ErrInvalidSchema if tool is nil or InputSchema is nil.
+//   - ValidateOutput: must validate against tool.OutputSchema when present; return nil when OutputSchema is nil.
+//   - Determinism: repeated calls with same inputs should be deterministic.
 // Implementations can be swapped to use different validation libraries.
 type SchemaValidator interface {
 	// Validate validates an instance against a JSON Schema.
