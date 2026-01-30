@@ -6,6 +6,47 @@ This journey shows how a tool definition flows from authoring to execution acros
 
 ![Diagram](assets/diagrams/user-journey.svg)
 
+```mermaid
+%%{init: {'theme': 'base', 'themeVariables': {'primaryColor': '#718096', 'primaryTextColor': '#fff'}}}%%
+flowchart TB
+    subgraph author["Tool Authoring"]
+        Define["📝 Define Tool<br/><small>toolmodel.Tool</small>"]
+        Schema["📐 InputSchema<br/><small>JSON Schema 2020-12</small>"]
+    end
+
+    subgraph validation["Validation"]
+        Validate["✅ Tool.Validate()"]
+        SchemaVal["✅ SchemaValidator"]
+    end
+
+    subgraph registration["Registration"]
+        Register["📇 toolindex.RegisterTool()"]
+        Backend["⚙️ ToolBackend<br/><small>local | provider | mcp</small>"]
+    end
+
+    subgraph discovery["Discovery"]
+        Search["🔍 search_tools"]
+        Summary["📋 Summary<br/><small>ID, Name, Tags</small>"]
+    end
+
+    subgraph execution["Execution"]
+        Describe["📚 describe_tool"]
+        Run["▶️ run_tool"]
+    end
+
+    Define --> Schema --> Validate
+    Validate --> SchemaVal --> Register
+    Register --> Backend
+    Backend --> Search --> Summary
+    Summary --> Describe --> Run
+
+    style author fill:#718096,stroke:#4a5568,stroke-width:2px
+    style validation fill:#38a169,stroke:#276749
+    style registration fill:#3182ce,stroke:#2c5282
+    style discovery fill:#d69e2e,stroke:#b7791f
+    style execution fill:#6b46c1,stroke:#553c9a
+```
+
 ## Step-by-step
 
 1. **Author defines a tool** using `toolmodel.Tool` with an MCP-compatible schema.
