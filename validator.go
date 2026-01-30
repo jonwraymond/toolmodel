@@ -100,6 +100,9 @@ func (v *DefaultValidator) Validate(schema any, instance any) error {
 
 // ValidateInput validates tool input arguments against the tool's InputSchema.
 func (v *DefaultValidator) ValidateInput(tool *Tool, args any) error {
+	if tool == nil {
+		return fmt.Errorf("%w: tool is nil", ErrInvalidSchema)
+	}
 	if tool.InputSchema == nil {
 		return fmt.Errorf("%w: InputSchema is nil", ErrInvalidSchema)
 	}
@@ -109,6 +112,9 @@ func (v *DefaultValidator) ValidateInput(tool *Tool, args any) error {
 // ValidateOutput validates tool output against the tool's OutputSchema if present.
 // Returns nil if OutputSchema is not defined.
 func (v *DefaultValidator) ValidateOutput(tool *Tool, result any) error {
+	if tool == nil {
+		return fmt.Errorf("%w: tool is nil", ErrInvalidSchema)
+	}
 	if tool.OutputSchema == nil {
 		return nil // OutputSchema is optional
 	}

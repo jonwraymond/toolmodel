@@ -81,16 +81,30 @@ func TestSchemaValidator_Contract(t *testing.T) {
 func TestDefaultValidator_Contract(t *testing.T) {
     v := NewDefaultValidator()
 
-    t.Run("ValidateInput returns ErrInvalidSchema on nil InputSchema", func(t *testing.T) {
-        err := v.ValidateInput(&Tool{}, map[string]any{})
-        if err == nil || !strings.Contains(err.Error(), ErrInvalidSchema.Error()) {
-            t.Fatalf("expected ErrInvalidSchema, got %v", err)
-        }
-    })
+	t.Run("ValidateInput returns ErrInvalidSchema on nil InputSchema", func(t *testing.T) {
+		err := v.ValidateInput(&Tool{}, map[string]any{})
+		if err == nil || !strings.Contains(err.Error(), ErrInvalidSchema.Error()) {
+			t.Fatalf("expected ErrInvalidSchema, got %v", err)
+		}
+	})
 
-    t.Run("ValidateOutput returns nil on nil OutputSchema", func(t *testing.T) {
-        if err := v.ValidateOutput(&Tool{}, map[string]any{}); err != nil {
-            t.Fatalf("expected nil, got %v", err)
-        }
-    })
+	t.Run("ValidateInput returns ErrInvalidSchema on nil tool", func(t *testing.T) {
+		err := v.ValidateInput(nil, map[string]any{})
+		if err == nil || !strings.Contains(err.Error(), ErrInvalidSchema.Error()) {
+			t.Fatalf("expected ErrInvalidSchema, got %v", err)
+		}
+	})
+
+	t.Run("ValidateOutput returns nil on nil OutputSchema", func(t *testing.T) {
+		if err := v.ValidateOutput(&Tool{}, map[string]any{}); err != nil {
+			t.Fatalf("expected nil, got %v", err)
+		}
+	})
+
+	t.Run("ValidateOutput returns ErrInvalidSchema on nil tool", func(t *testing.T) {
+		err := v.ValidateOutput(nil, map[string]any{})
+		if err == nil || !strings.Contains(err.Error(), ErrInvalidSchema.Error()) {
+			t.Fatalf("expected ErrInvalidSchema, got %v", err)
+		}
+	})
 }
