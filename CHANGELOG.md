@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1](https://github.com/jonwraymond/toolmodel/compare/toolmodel-v0.2.0...toolmodel-v0.2.1) (2026-01-31)
+
+
+### Bug Fixes
+
+* **toolmodel:** harden SchemaValidator nil handling ([1b9fb32](https://github.com/jonwraymond/toolmodel/commit/1b9fb32c1daff15da65dc2b727d0eaba6eb3444d))
+
 ## [0.2.0](https://github.com/jonwraymond/toolmodel/compare/toolmodel-v0.1.3...toolmodel-v0.2.0) (2026-01-28)
 
 
